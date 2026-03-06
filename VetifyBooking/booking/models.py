@@ -84,24 +84,38 @@ class Pet(models.Model):
 class Appointment(models.Model):
 
     SERVICES = [
-        ('checkup', 'General Checkup'),
-        ('vaccination', 'Vaccination'),
-        ('dental', 'Dental Cleaning'),
-        ('grooming', 'Grooming'),
-        ('surgery', 'Surgery Consultation'),
-        ('emergency', 'Emergency Visit'),
+        ('checkup', 'Consulta General'),
+        ('vaccination', 'Vacunación'),
+        ('dental', 'Limpieza Dental'),
+        ('grooming', 'Estética'),
+        ('surgery', 'Consulta de Cirugía'),
+        ('emergency', 'Emergencia'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pendiente'),
+        ('confirmed', 'Confirmada'),
+        ('completed', 'Completada'),
+        ('cancelled', 'Cancelada'),
     ]
 
     # Usuario dueño de la cita
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointments')
 
-    # 🔥 Relación REAL con la mascota
+    # Mascota
     pet = models.ForeignKey(Pet, on_delete=models.CASCADE, related_name='appointments')
 
     # Datos de la cita
     service = models.CharField(max_length=20, choices=SERVICES)
     date = models.DateField()
     time = models.TimeField()
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+
     notes = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -110,8 +124,8 @@ class Appointment(models.Model):
         ordering = ['date', 'time']
 
     def __str__(self):
-        return f"{self.pet.name} - {self.date} at {self.time}"
-    
+        return f"{self.pet.name} - {self.date} {self.time} ({self.status})"
+
 class Service(models.Model):
     """Servicios que ofrece la veterinaria"""
     name = models.CharField(max_length=100, verbose_name="Nombre del servicio")
@@ -260,10 +274,42 @@ class Document(models.Model):
 from django.db import models
 from django.contrib.auth.models import User
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20, blank=True)
-    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
-
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    bio = models.TextField(max_length=500, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
-        return self.user.username
+        return f"Perfil de {self.user.username}"
+
+
+class Appointment(models.Model):
+
+    STATUS_CHOICES = [
+        ("pending", "Pendiente"),
+        ("confirmed", "Confirmada"),
+        ("completed", "Completada"),
+        ("cancelled", "Cancelada"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+
+    service = models.CharField(max_length=100)
+
+    date = models.DateField()
+    time = models.TimeField()
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -101,7 +101,7 @@ def appointments_view(request):
     date_filter = request.GET.get('date', '')
     search = request.GET.get('search', '')
     
-    appointments = Appointment.objects.select_related('user').order_by('-date', '-time')
+    appointments = Appointment.objects.select_related('user', 'pet').order_by('-date', '-time')
     
     # Aplicar filtros
     if status_filter == 'today':
@@ -118,7 +118,7 @@ def appointments_view(request):
         appointments = appointments.filter(
             Q(user__username__icontains=search) |
             Q(user__email__icontains=search) |
-            Q(pet_name__icontains=search)
+            Q(pet__name__icontains=search)
         )
     
     context = {

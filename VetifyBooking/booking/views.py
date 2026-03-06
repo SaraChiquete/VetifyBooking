@@ -142,6 +142,40 @@ def profile_view(request):
     return render(request, 'booking/profile.html', context)
 
 
+from .forms import (
+    RegisterForm,
+    AppointmentForm,
+    UserUpdateForm,
+    ProfileUpdateForm
+)
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(
+            request.POST,
+            request.FILES,
+            instance=request.user.profile
+        )
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('profile')
+
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form
+    }
+
+    return render(request, 'booking/edit_profile.html', context)
+
+
 @login_required
 def register_pet_view(request):
     if request.method == 'POST':
@@ -323,3 +357,158 @@ def documents_view(request):
             'total_documents': documents.count(),
         }
     )
+    
+    
+# booking/views.py - Vistas para el perfil de usuario
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Count, Q
+from .models import UserProfile, Pet, Appointment
+from datetime import datetime
+
+@login_required
+def profile(request):
+    """
+    Vista para mostrar el perfil del usuario
+    """
+    # Obtener o crear el perfil del usuario
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    # Obtener estadísticas del usuario
+    total_appointments = Appointment.objects.filter(user=request.user).count()
+    completed_appointments = Appointment.objects.filter(
+        user=request.user, 
+        status='completed'
+    ).count()
+    pending_appointments = Appointment.objects.filter(
+        user=request.user, 
+        status__in=['pending', 'confirmed']
+    ).count()
+    
+    context = {
+        'user': request.user,
+        'profile': profile,
+        'total_appointments': total_appointments,
+        'completed_appointments': completed_appointments,
+        'pending_appointments': pending_appointments,
+    }
+    
+    return render(request, 'booking/profile.html', context)
+
+
+@login_required
+def edit_profile(request):
+    """
+    Vista para editar el perfil del usuario
+    """
+    # Obtener o crear el perfil del usuario
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        # Actualizar información del usuario
+        request.user.first_name = request.POST.get('first_name', '')
+        request.user.last_name = request.POST.get('last_name', '')
+        request.user.email = request.POST.get('email', '')
+        request.user.save()
+        
+        # Actualizar información del perfil
+        profile.phone = request.POST.get('phone', '')
+        profile.address = request.POST.get('address', '')
+        profile.bio = request.POST.get('bio', '')
+        
+        # Manejar fecha de nacimiento
+        date_of_birth = request.POST.get('date_of_birth')
+        if date_of_birth:
+            try:
+                profile.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+        
+        profile.save()
+        
+        messages.success(request, '¡Tu perfil ha sido actualizado exitosamente!')
+        return redirect('profile')
+    
+    context = {
+        'user': request.user,
+        'profile': profile,
+    }
+    
+    return render(request, 'booking/edit_profile.html', context)
+
+
+@login_required
+def update_avatar(request):
+    """
+    Vista para actualizar la foto de perfil del usuario
+    """
+    if request.method == 'POST' and request.FILES.get('avatar'):
+        # Obtener o crear el perfil del usuario
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+        
+        # Actualizar avatar
+        profile.avatar = request.FILES['avatar']
+        profile.save()
+        
+        messages.success(request, '¡Tu foto de perfil ha sido actualizada!')
+        return redirect('edit_profile')
+    
+    return redirect('edit_profile')
+
+
+@login_required
+def edit_pet(request, pet_id):
+    """
+    Vista para editar una mascota
+    """
+    pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
+    
+    if request.method == 'POST':
+        pet.name = request.POST.get('name', '')
+        pet.species = request.POST.get('species', '')
+        pet.breed = request.POST.get('breed', '')
+        pet.age = request.POST.get('age', '')
+        pet.gender = request.POST.get('gender', '')
+        pet.weight = request.POST.get('weight', '')
+        pet.medical_notes = request.POST.get('medical_notes', '')
+        
+        # Manejar fecha de nacimiento de la mascota
+        birth_date = request.POST.get('birth_date')
+        if birth_date:
+            try:
+                pet.birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+        
+        pet.save()
+        
+        messages.success(request, f'¡Los datos de {pet.name} han sido actualizados!')
+        return redirect('profile')
+    
+    context = {
+        'pet': pet,
+    }
+    
+    return render(request, 'booking/edit_pet.html', context)
+
+
+@login_required
+def delete_pet(request, pet_id):
+    """
+    Vista para eliminar una mascota
+    """
+    pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
+    
+    if request.method == 'POST':
+        pet_name = pet.name
+        pet.delete()
+        messages.success(request, f'{pet_name} ha sido eliminado de tu perfil.')
+        return redirect('profile')
+    
+    context = {
+        'pet': pet,
+    }
+    
+    return render(request, 'booking/confirm_delete_pet.html', context)

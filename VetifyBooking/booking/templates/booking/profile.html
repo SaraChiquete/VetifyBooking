@@ -4,324 +4,263 @@
 {% block title %}Mi Perfil - Vetify{% endblock %}
 
 {% block extra_css %}
-<style>
-    .profile-container {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 2rem;
-    }
-
-    .profile-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 2rem;
-    }
-
-    .profile-header h1 {
-        font-size: 2rem;
-        color: #0284c7;
-        margin-bottom: 0.5rem;
-    }
-
-    .profile-header p {
-        color: #6b7280;
-    }
-
-    .btn {
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn-primary {
-        background: #38bdf8;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #0284c7;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
-    }
-
-    .btn-outline {
-        background: white;
-        color: #0284c7;
-        border: 2px solid #38bdf8;
-    }
-
-    .btn-outline:hover {
-        background: #e0f2fe;
-    }
-
-    .btn-sm {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-    }
-
-    .card {
-        background: white;
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-    }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .card-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #0284c7;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    /* Avatar */
-
-    .avatar-section {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .avatar {
-        width: 128px;
-        height: 128px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #bae6fd 0%, #38bdf8 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 6px rgba(56, 189, 248, 0.3);
-        border: 4px solid white;
-        overflow: hidden;
-    }
-
-    .avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .avatar-initial {
-        font-size: 3.5rem;
-        font-weight: 700;
-        color: white;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .info-item {
-        background: #f9fafb;
-        padding: 1rem;
-        border-radius: 0.5rem;
-    }
-
-    .info-label {
-        font-size: 0.875rem;
-        color: #6b7280;
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-    }
-
-    .info-value {
-        font-weight: 600;
-        color: #1f2937;
-    }
-
-    .pets-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .pet-card {
-        background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%);
-        border: 1px solid #bae6fd;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        transition: all 0.3s;
-    }
-
-    .pet-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 16px rgba(56, 189, 248, 0.2);
-    }
-
-    .pet-header {
-        display: flex;
-        gap: 1.25rem;
-        margin-bottom: 1rem;
-    }
-
-    .pet-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 1rem;
-        background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.5rem;
-        flex-shrink: 0;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .pet-name {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #0284c7;
-        margin-bottom: 0.5rem;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .badge-dog { background: #dbeafe; color: #1e40af; }
-    .badge-cat { background: #fce7f3; color: #9f1239; }
-    .badge-other { background: #e9d5ff; color: #6b21a8; }
-
-    .pet-details {
-        color: #6b7280;
-        font-size: 0.875rem;
-        margin: 0.25rem 0;
-    }
-
-    .pet-actions {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid #bae6fd;
-    }
-
-    .pet-actions .btn { flex: 1; }
-
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: #e0f2fe;
-        border: 2px dashed #bae6fd;
-        border-radius: 1rem;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-
-    .stat-card {
-        background: white;
-        border-radius: 1rem;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #0284c7;
-        margin-bottom: 0.25rem;
-    }
-
-    .stat-label {
-        font-size: 0.875rem;
-        color: #6b7280;
-    }
-
-    @media (max-width: 768px) {
-        .profile-header {
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .info-grid,
-        .pets-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/profile-styles.css' %}">
 {% endblock %}
 
 {% block content %}
+<!-- HEADER DE LA PÁGINA -->
+<section class="page-header">
+    <div class="container">
+        <div class="page-header-content">
+            <h1 class="page-header-title">
+                <span class="page-header-icon"><i class="bi bi-person-circle"></i></span>
+                Mi Perfil
+            </h1>
+            <p class="page-header-subtitle">
+                Gestiona tu información personal y tus mascotas registradas
+            </p>
+        </div>
+    </div>
+</section>
+
 <div class="profile-container">
-
-    <div class="profile-header">
-        <div>
-            <h1>Mi Perfil</h1>
-            <p>Gestiona tu información personal y tus mascotas</p>
-        </div>
-        <a href="#" class="btn btn-primary">✏️ Editar Perfil</a>
-    </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">👤 Información Personal</h2>
-            <button class="btn btn-outline btn-sm">Editar</button>
+    <!-- CARD DE INFORMACIÓN PERSONAL -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <h2 class="profile-card-title">
+                <i class="bi bi-person-badge"></i>
+                Información Personal
+            </h2>
+            <a href="{% url 'edit_profile' %}" class="btn-edit-profile">
+                <i class="bi bi-pencil-square"></i>
+                Editar Perfil
+            </a>
         </div>
 
-        <div class="avatar-section">
-            <div class="avatar">
-                {% if user.profile.avatar %}
-                    <img src="{{ user.profile.avatar.url }}" alt="Avatar">
-                {% else %}
-                    <span class="avatar-initial">
-                        {{ user.first_name|first|default:user.username|first|upper }}
+        <div class="profile-content">
+            <!-- Avatar Section -->
+            <div class="profile-avatar-section">
+                <div class="profile-avatar">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="{{ user.get_full_name }}">
+                    {% else %}
+                        <div class="profile-avatar-placeholder">
+                            <span>{{ user.first_name|first|default:user.username|first|upper }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="profile-avatar-info">
+                    <h3 class="profile-user-name">{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="profile-user-role">Cliente Vetify</p>
+                    <span class="profile-user-badge">
+                        <i class="bi bi-patch-check-fill"></i>
+                        Verificado
                     </span>
-                {% endif %}
+                </div>
             </div>
-            <button class="btn btn-outline btn-sm">📷 Cambiar Foto</button>
-        </div>
 
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Nombre Completo</div>
-                <div class="info-value">{{ user.get_full_name|default:user.username }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Correo Electrónico</div>
-                <div class="info-value">{{ user.email }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Teléfono</div>
-                <div class="info-value">{{ user.profile.phone|default:"No registrado" }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Miembro Desde</div>
-                <div class="info-value">{{ user.date_joined|date:"d M Y" }}</div>
+            <!-- Información en grid -->
+            <div class="profile-info-grid">
+                <div class="profile-info-item">
+                    <div class="profile-info-icon">
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Correo Electrónico</div>
+                        <div class="profile-info-value">{{ user.email }}</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Teléfono</div>
+                        <div class="profile-info-value">{{ user.profile.phone|default:"No registrado" }}</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Dirección</div>
+                        <div class="profile-info-value">{{ user.profile.address|default:"No registrada" }}</div>
+                    </div>
+                </div>
+
+                <div class="profile-info-item">
+                    <div class="profile-info-icon">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                    <div class="profile-info-content">
+                        <div class="profile-info-label">Miembro Desde</div>
+                        <div class="profile-info-value">{{ user.date_joined|date:"d M Y" }}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- ESTADÍSTICAS RÁPIDAS -->
+    <div class="profile-stats-grid">
+        <div class="profile-stat-card">
+            <div class="profile-stat-icon profile-stat-icon-blue">
+                <i class="bi bi-calendar-event"></i>
+            </div>
+            <div class="profile-stat-content">
+                <div class="profile-stat-value">{{ total_appointments|default:0 }}</div>
+                <div class="profile-stat-label">Citas Totales</div>
+            </div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-icon profile-stat-icon-green">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="profile-stat-content">
+                <div class="profile-stat-value">{{ completed_appointments|default:0 }}</div>
+                <div class="profile-stat-label">Completadas</div>
+            </div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-icon profile-stat-icon-purple">
+                <i class="bi bi-heart-pulse"></i>
+            </div>
+            <div class="profile-stat-content">
+                <div class="profile-stat-value">{{ user.pets.count|default:0 }}</div>
+                <div class="profile-stat-label">Mascotas</div>
+            </div>
+        </div>
+
+        <div class="profile-stat-card">
+            <div class="profile-stat-icon profile-stat-icon-orange">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="profile-stat-content">
+                <div class="profile-stat-value">{{ pending_appointments|default:0 }}</div>
+                <div class="profile-stat-label">Pendientes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MIS MASCOTAS -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <h2 class="profile-card-title">
+                <i class="bi bi-heart-fill"></i>
+                Mis Mascotas
+            </h2>
+            <a href="{% url 'register_pet' %}" class="btn-add-pet">
+                <i class="bi bi-plus-circle"></i>
+                Agregar Mascota
+            </a>
+        </div>
+
+        <div class="pets-grid">
+            {% for pet in user.pets.all %}
+            <div class="pet-card">
+                <div class="pet-card-header">
+                    <div class="pet-avatar">
+                        {% if pet.species == 'dog' %}
+                            🐕
+                        {% elif pet.species == 'cat' %}
+                            🐈
+                        {% elif pet.species == 'bird' %}
+                            🐦
+                        {% elif pet.species == 'rabbit' %}
+                            🐰
+                        {% else %}
+                            🐾
+                        {% endif %}
+                    </div>
+                    <div class="pet-info">
+                        <h3 class="pet-name">{{ pet.name }}</h3>
+                        <span class="pet-badge pet-badge-{{ pet.species }}">
+                            {{ pet.get_species_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pet-details">
+                    <div class="pet-detail-item">
+                        <i class="bi bi-palette"></i>
+                        <span>{{ pet.breed|default:"Sin raza" }}</span>
+                    </div>
+                    <div class="pet-detail-item">
+                        <i class="bi bi-calendar3"></i>
+                        <span>{{ pet.age|default:"Edad no registrada" }}</span>
+                    </div>
+                    <div class="pet-detail-item">
+                        <i class="bi bi-gender-ambiguous"></i>
+                        <span>{{ pet.get_gender_display|default:"No especificado" }}</span>
+                    </div>
+                </div>
+
+                <div class="pet-actions">
+                    <a href="{% url 'edit_pet' pet.id %}" class="pet-btn pet-btn-edit">
+                        <i class="bi bi-pencil"></i>
+                        Editar
+                    </a>
+                    <a href="{% url 'booking' %}?pet={{ pet.id }}" class="pet-btn pet-btn-primary">
+                        <i class="bi bi-calendar-plus"></i>
+                        Reservar
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-emoji-frown"></i>
+                </div>
+                <h3 class="empty-state-title">No tienes mascotas registradas</h3>
+                <p class="empty-state-text">Agrega tu primera mascota para comenzar a hacer reservas</p>
+                <a href="{% url 'register_pet' %}" class="empty-state-btn">
+                    <i class="bi bi-plus-circle"></i>
+                    Registrar Mi Primera Mascota
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="profile-quick-actions">
+        <a href="{% url 'appointments' %}" class="quick-action-card">
+            <div class="quick-action-icon">
+                <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="quick-action-content">
+                <h3 class="quick-action-title">Mis Citas</h3>
+                <p class="quick-action-text">Ver historial de citas</p>
+            </div>
+            <i class="bi bi-chevron-right quick-action-arrow"></i>
+        </a>
+
+        <a href="{% url 'booking' %}" class="quick-action-card">
+            <div class="quick-action-icon">
+                <i class="bi bi-calendar-plus"></i>
+            </div>
+            <div class="quick-action-content">
+                <h3 class="quick-action-title">Nueva Reserva</h3>
+                <p class="quick-action-text">Agendar nueva cita</p>
+            </div>
+            <i class="bi bi-chevron-right quick-action-arrow"></i>
+        </a>
+
+        <a href="{% url 'services_schedules' %}" class="quick-action-card">
+            <div class="quick-action-icon">
+                <i class="bi bi-hospital"></i>
+            </div>
+            <div class="quick-action-content">
+                <h3 class="quick-action-title">Servicios</h3>
+                <p class="quick-action-text">Ver servicios disponibles</p>
+            </div>
+            <i class="bi bi-chevron-right quick-action-arrow"></i>
+        </a>
+    </div>
 </div>
 {% endblock %}

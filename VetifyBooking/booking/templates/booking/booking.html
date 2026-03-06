@@ -7,8 +7,8 @@
     <div class="container">
 
         <div class="booking-header">
-            <h2>Book an Appointment</h2>
-            <p>Schedule a visit for your furry friend with our veterinary specialists.</p>
+            <h2><i class="bi bi-calendar-plus"></i> Reservar una Cita</h2>
+            <p>Agenda una visita para tu mascota con nuestros especialistas veterinarios.</p>
         </div>
 
         <div class="booking-grid">
@@ -19,13 +19,14 @@
                     {{ form.as_p }}
 
                     <button type="submit" class="booking-btn">
-                        Confirm Appointment
+                        <i class="bi bi-check-circle"></i>
+                        Confirmar Cita
                     </button>
                 </form>
             </div>
 
             <div class="booking-image">
-                <img src="{% static 'images/dog.jpg' %}" alt="Pet">
+                <img src="{% static 'images/dog.jpg' %}" alt="Mascota">
             </div>
 
         </div>
