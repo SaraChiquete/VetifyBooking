@@ -383,12 +383,13 @@
     <div class="page-header">
         <h1>
         <i class="bi bi-paw-fill"></i>
-        Registrar Nueva Mascota
+            {{ page_title|default:"Registrar Nueva Mascota" }}
         </h1>
-        <p>Añade a tu compañero peludo a nuestro sistema</p>
+        <p>{{ page_description|default:"Añade a tu compañero peludo a nuestro sistema" }}</p>
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data"
+    action="{% if pet %}{% url 'edit_pet' pet.id %}{% else %}{% url 'register_pet' %}{% endif %}">
         {% csrf_token %}
         
         <div class="form-grid">
@@ -401,7 +402,14 @@
 
                         <div class="form-group">
                             <label class="form-label"><i class="bi bi-paw"></i> Nombre de la Mascota *</label>
-                            <input type="text" name="name" class="form-input" placeholder="Nombre de tu mascota" required id="petName" oninput="updatePreview()">
+                            <input type="text"
+                            name="name"
+                            class="form-input"
+                            placeholder="Nombre de tu mascota"
+                            value="{{ pet.name|default:'' }}"
+                            required
+                            id="petName"
+                            oninput="updatePreview()">
                         </div>
 
                         <div class="form-group">
@@ -411,7 +419,7 @@
 
                                 <div class="radio-option">
                                     <div class="radio-card">
-                                        <input type="radio" name="pet_type" value="dog" id="dog" checked onchange="updatePreview()">
+                                        <input type="radio" name="species" value="dog" id="dog" {% if pet.species == "dog" %}checked{% endif %} onchange="updatePreview()">
                                         <label for="dog">
                                             <div class="radio-emoji">🐕</div>
                                             <div>Perro</div>
@@ -421,7 +429,7 @@
 
                                 <div class="radio-option">
                                     <div class="radio-card">
-                                        <input type="radio" name="pet_type" value="cat" id="cat" onchange="updatePreview()">
+                                        <input type="radio" name="species" value="cat" id="cat" {% if pet.species == "cat" %}checked{% endif %} onchange="updatePreview()">
                                         <label for="cat">
                                             <div class="radio-emoji">🐈</div>
                                             <div>Gato</div>
@@ -431,7 +439,7 @@
 
                                 <div class="radio-option">
                                     <div class="radio-card">
-                                        <input type="radio" name="pet_type" value="other" id="other" onchange="updatePreview()">
+                                        <input type="radio" name="species" value="other" id="other" {% if pet.species == "other" %}checked{% endif %} onchange="updatePreview()">
                                         <label for="other">
                                             <div class="radio-emoji">🐰</div>
                                             <div>Otro</div>
@@ -455,18 +463,34 @@
                         <div class="form-grid-2">
                             <div class="form-group">
                                 <label class="form-label"><i class="bi bi-bullseye"></i> Raza</label>
-                                <input type="text" name="breed" class="form-input" placeholder="Seleccionar raza">
+                                <input type="text"
+                                name="breed"
+                                class="form-input"
+                                placeholder="Seleccionar raza"
+                                value="{{ pet.breed|default:'' }}">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label"><i class="bi bi-palette"></i> Color</label>
-                                <input type="text" name="color" class="form-input" placeholder="ej: Café, Negro, Blanco">
+                                <input type="text"
+                                name="color"
+                                class="form-input"
+                                placeholder="ej: Café, Negro, Blanco"
+                                value="{{ pet.color|default:'' }}">
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label"><i class="bi bi-cake2"></i> Edad *</label>
                                 <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <input type="number" name="age" class="form-input" placeholder="0" min="0" required id="petAge" onchange="updatePreview()">
+                                    <input type="number"
+                                    name="age"
+                                    class="form-input"
+                                    placeholder="0"
+                                    min="0"
+                                    required
+                                    value="{{ pet.age|default:'' }}"
+                                    id="petAge"
+                                    onchange="updatePreview()">
                                     <span>años</span>
                                 </div>
                             </div>
@@ -474,7 +498,16 @@
                             <div class="form-group">
                                 <label class="form-label"><i class="bi bi-speedometer2"></i> Peso *</label>
                                 <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <input type="number" step="0.1" name="weight" class="form-input" placeholder="0.0" min="0" required id="petWeight" onchange="updatePreview()">
+                                    <input type="number"
+                                    step="0.1"
+                                    name="weight"
+                                    class="form-input"
+                                    placeholder="0.0"
+                                    min="0"
+                                    required
+                                    value="{{ pet.weight|default:'' }}"
+                                    id="petWeight"
+                                    onchange="updatePreview()">
                                     <span>kg</span>
                                 </div>
                             </div>
@@ -577,7 +610,7 @@
                     <!-- Action Buttons -->
                     <div class="btn-group">
                         <a href="{% url 'profile' %}" class="btn btn-outline">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Registrar Mascota</button>
+                        <button type="submit" class="btn btn-primary">{{ button_text|default:"Registrar Mascota" }}</button>
                     </div>
                 </div>
             </div>
@@ -634,7 +667,7 @@
 {% block extra_js %}
 <script>
     // Show/hide other type field
-    document.querySelectorAll('input[name="pet_type"]').forEach(radio => {
+    document.querySelectorAll('input[name="species"]').forEach(radio => {
         radio.addEventListener('change', function() {
             document.getElementById('otherTypeGroup').style.display = 
                 this.value === 'other' ? 'block' : 'none';
@@ -648,7 +681,7 @@
         document.getElementById('previewName').textContent = name;
 
         // Type
-        const type = document.querySelector('input[name="pet_type"]:checked').value;
+        const type = document.querySelector('input[name="species"]:checked').value;
         const typeLabels = { dog: 'Perro', cat: 'Gato', other: 'Otro' };
 
         const icons = {

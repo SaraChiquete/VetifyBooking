@@ -1,6 +1,6 @@
 {% extends 'booking/base.html' %}
 
-{% block title %}My Appointments - Vetify Booking{% endblock %}
+{% block title %}Mis Citas - Vetify Booking{% endblock %}
 
 {% block content %}
 <section class="appointments-page">
@@ -19,34 +19,46 @@
         {% if appointments %}
         <div class="appointments-card">
 
+            <div class="appointment-row header">
+                <strong>Mascota</strong>
+                <strong>Fecha</strong>
+                <strong>Hora</strong>
+                <strong>Servicio</strong>
+                <strong></strong>
+            </div>
+
             {% for appointment in appointments %}
             <div class="appointment-row">
 
-                <div class="appointment-info">
-                    <h4>{{ appointment.pet_name }}</h4>
-                    <p class="appointment-owner">{{ appointment.owner_name }}</p>
+                <div class="appointment-main">
+                    <h4>{{ appointment.pet.name }}</h4>
                 </div>
 
-                <div class="appointment-meta">
-                    <span class="appointment-date">
-                        {{ appointment.date|date:"M d, Y" }}
-                    </span>
-                    <span class="appointment-time">
-                        {{ appointment.time|time:"g:i A" }}
-                    </span>
+                <div class="appointment-date">
+                    {{ appointment.date|date:"M d, Y" }}
+                </div>
+
+                <div class="appointment-time">
+                    {{ appointment.time|time:"g:i A" }}
                 </div>
 
                 <div class="appointment-service">
                     {{ appointment.get_service_display }}
                 </div>
 
-                <form method="post" action="{% url 'delete_appointment' appointment.pk %}">
-                    {% csrf_token %}
-                    <button type="submit" class="delete-btn"
-                        onclick="return confirm('Delete this appointment?')">
-                        Delete
-                    </button>
-                </form>
+                <div class="appointment-status">
+                    {{ appointment.get_status_display }}
+                </div>
+
+                <div class="appointment-actions">
+                    <form method="post" action="{% url 'delete_appointment' appointment.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-btn"
+                            onclick="return confirm('Delete this appointment?')">
+                            Cancelar
+                        </button>
+                    </form>
+                </div>
 
             </div>
             {% endfor %}
@@ -54,10 +66,10 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <h3>No appointments scheduled</h3>
-            <p>Start by booking your pet’s first visit.</p>
+            <h3>No hay citas reservadas.</h3>
+            <p>Comienze con su primera cita.</p>
             <a href="{% url 'booking' %}" class="btn-primary">
-                Book Appointment
+                Reservar cita
             </a>
         </div>
         {% endif %}

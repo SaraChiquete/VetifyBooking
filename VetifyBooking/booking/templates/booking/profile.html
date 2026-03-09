@@ -164,16 +164,12 @@
             <div class="pet-card">
                 <div class="pet-card-header">
                     <div class="pet-avatar">
-                        {% if pet.species == 'dog' %}
-                            <i class="bi bi-heart"></i>
-                        {% elif pet.species == 'cat' %}
-                            <i class="bi bi-heart-fill"></i>
-                        {% elif pet.species == 'bird' %}
-                            <i class="bi bi-twitter"></i>
-                        {% elif pet.species == 'rabbit' %}
-                            <i class="bi bi-emoji-smile"></i>
+                        {% if pet.pet_type == "dog" %}
+                            🐶
+                        {% elif pet.pet_type == "cat" %}
+                            🐱
                         {% else %}
-                            <i class="bi bi-paw"></i>
+                            🐾
                         {% endif %}
                     </div>
                     <div class="pet-info">

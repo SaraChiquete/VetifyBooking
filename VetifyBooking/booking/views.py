@@ -181,8 +181,8 @@ def register_pet_view(request):
     if request.method == 'POST':
         pet = Pet(owner=request.user)
 
-        pet.name = request.POST.get('pet_name')
-        pet.pet_type = request.POST.get('pet_type')
+        pet.name = request.POST.get('name')  
+        pet.pet_type = request.POST.get('species')
         pet.other_type = request.POST.get('other_type', '')
         pet.breed = request.POST.get('breed', '')
         pet.color = request.POST.get('color', '')
@@ -201,68 +201,12 @@ def register_pet_view(request):
             pet.photo = request.FILES['photo']
 
         pet.save()
-        messages.success(
-            request,
-            f'¡{pet.name} ha sido registrado exitosamente! 🎉'
-        )
+
+        messages.success(request, f'¡{pet.name} ha sido registrado exitosamente! 🎉')
         return redirect('profile')
 
     return render(request, 'booking/register_pet.html')
 
-
-@login_required
-def edit_pet_view(request, pet_id):
-    pet = get_object_or_404(
-        Pet,
-        id=pet_id,
-        owner=request.user
-    )
-
-    if request.method == 'POST':
-        pet.name = request.POST.get('pet_name')
-        pet.pet_type = request.POST.get('pet_type')
-        pet.other_type = request.POST.get('other_type', '')
-        pet.breed = request.POST.get('breed', '')
-        pet.color = request.POST.get('color', '')
-        pet.age = request.POST.get('age', 0)
-        pet.weight = request.POST.get('weight', 0)
-        pet.vaccination_status = request.POST.get('vaccination', 'updated')
-        pet.allergies = request.POST.get('allergies', '')
-        pet.friendly_with_people = request.POST.get('friendly_people') == 'on'
-        pet.friendly_with_animals = request.POST.get('friendly_animals') == 'on'
-        pet.nervous_at_vet = request.POST.get('nervous') == 'on'
-        pet.special_care = request.POST.get('special_care') == 'on'
-        pet.emergency_contact_name = request.POST.get('emergency_name', '')
-        pet.emergency_contact_phone = request.POST.get('emergency_phone', '')
-
-        if 'photo' in request.FILES:
-            pet.photo = request.FILES['photo']
-
-        pet.save()
-        messages.success(
-            request,
-            f'¡{pet.name} ha sido actualizado exitosamente!'
-        )
-        return redirect('profile')
-
-    return render(
-        request,
-        'booking/register_pet.html',
-        {'pet': pet}
-    )
-
-
-@login_required
-def delete_pet_view(request, pet_id):
-    pet = get_object_or_404(
-        Pet,
-        id=pet_id,
-        owner=request.user
-    )
-    pet_name = pet.name
-    pet.delete()
-    messages.success(request, f'{pet_name} ha sido eliminado.')
-    return redirect('profile')
 
 
 # =============================
@@ -458,40 +402,29 @@ def update_avatar(request):
     return redirect('edit_profile')
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Pet
+
+
 @login_required
 def edit_pet(request, pet_id):
-    """
-    Vista para editar una mascota
-    """
+
     pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
-    
-    if request.method == 'POST':
-        pet.name = request.POST.get('name', '')
-        pet.species = request.POST.get('species', '')
-        pet.breed = request.POST.get('breed', '')
-        pet.age = request.POST.get('age', '')
-        pet.gender = request.POST.get('gender', '')
-        pet.weight = request.POST.get('weight', '')
-        pet.medical_notes = request.POST.get('medical_notes', '')
-        
-        # Manejar fecha de nacimiento de la mascota
-        birth_date = request.POST.get('birth_date')
-        if birth_date:
-            try:
-                pet.birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
-            except ValueError:
-                pass
-        
+
+    if request.method == "POST":
+        pet.name = request.POST.get("name")
+        pet.species = request.POST.get("species")
+        pet.breed = request.POST.get("breed")
+        pet.age = request.POST.get("age")
+        pet.weight = request.POST.get("weight")
+        pet.notes = request.POST.get("notes")
+
         pet.save()
-        
-        messages.success(request, f'¡Los datos de {pet.name} han sido actualizados!')
-        return redirect('profile')
-    
-    context = {
-        'pet': pet,
-    }
-    
-    return render(request, 'booking/edit_pet.html', context)
+
+        return redirect("profile")
+
+    return render(request, "booking/register_pet.html", {"pet": pet})
 
 
 @login_required
@@ -512,3 +445,5 @@ def delete_pet(request, pet_id):
     }
     
     return render(request, 'booking/confirm_delete_pet.html', context)
+
+
