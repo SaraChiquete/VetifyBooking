@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from booking.models import Appointment, Pet, Service, Veterinarian, ClinicSchedule
 from .decorators import admin_required
 import json
+from django.contrib.auth import update_session_auth_hash
 
 
 from django.contrib.auth import authenticate, login
@@ -859,3 +860,58 @@ def create_schedule_view(request):
         )
         messages.success(request, 'Horario creado exitosamente.')
     return redirect('admin_dashboard:schedules')
+
+from django.conf import settings
+
+def admin_register_view(request):
+    if request.user.is_authenticated and request.user.is_superuser:
+        return redirect('admin_dashboard:dashboard')
+
+    if request.method == 'POST':
+        secret = request.POST.get('secret_key')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        if secret != settings.ADMIN_SECRET_KEY:
+            messages.error(request, 'Clave secreta incorrecta.')
+            return redirect('admin_dashboard:admin_register')
+
+        if password != password2:
+            messages.error(request, 'Las contraseñas no coinciden.')
+            return redirect('admin_dashboard:admin_register')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Ese usuario ya existe.')
+            return redirect('admin_dashboard:admin_register')
+
+        user = User.objects.create_superuser(
+            username=username,
+            email=email,
+            password=password
+        )
+        login(request, user)
+        return redirect('admin_dashboard:dashboard')
+
+    return render(request, 'admin_dashboard/admin_register.html')
+
+@admin_required
+def admin_profile_view(request):
+    if request.method == 'POST':
+        request.user.first_name = request.POST.get('first_name', '')
+        request.user.last_name = request.POST.get('last_name', '')
+        request.user.email = request.POST.get('email', '')
+        request.user.save()
+
+        # Contraseña opcional
+        new_password = request.POST.get('new_password', '')
+        if new_password:
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)
+
+        messages.success(request, 'Perfil actualizado exitosamente.')
+        return redirect('admin_dashboard:admin_profile')
+
+    return render(request, 'admin_dashboard/admin_profile.html')

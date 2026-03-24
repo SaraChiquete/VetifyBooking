@@ -18,6 +18,8 @@ urlpatterns = [
     path('users/', views.users_view, name='users'),
     path('users/toggle/<int:user_id>/', views.toggle_user_status, name='toggle_user_status'),
     path('users/create/', views.create_user_view, name='create_user'),
+    path('register/', views.admin_register_view, name='admin_register'),
+    path('profile/', views.admin_profile_view, name='admin_profile'),
 
     # Gestión de mascotas
     path('pets/', views.pets_view, name='pets'),

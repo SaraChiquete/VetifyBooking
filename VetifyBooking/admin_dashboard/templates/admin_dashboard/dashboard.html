@@ -370,7 +370,7 @@
 
         <div class="pie-chart">
 
-            <div class="pie-visual"></div>
+            <div class="pie-visual" id="pieChart"></div>
 
             <div class="pie-legend">
 
@@ -552,6 +552,30 @@ setTimeout(() => {
     });
 
 }, 5000);
+
+// Gráfica dinámica de mascotas
+const petsData = [
+    {% for pet_type in pets_by_type %}
+    { type: '{{ pet_type.pet_type }}', count: {{ pet_type.count }} },
+    {% endfor %}
+];
+
+const colors = { dog: '#3b82f6', cat: '#ec4899', other: '#8b5cf6' };
+const total = petsData.reduce((sum, p) => sum + p.count, 0);
+
+if (total > 0) {
+    let currentDeg = 0;
+    const segments = petsData.map(p => {
+        const deg = (p.count / total) * 360;
+        const segment = `${colors[p.type] || '#94a3b8'} ${currentDeg}deg ${currentDeg + deg}deg`;
+        currentDeg += deg;
+        return segment;
+    }).join(', ');
+
+    document.getElementById('pieChart').style.background = `conic-gradient(${segments})`;
+} else {
+    document.getElementById('pieChart').style.background = '#e5e7eb';
+}
 
 </script>
 {% endblock %}
