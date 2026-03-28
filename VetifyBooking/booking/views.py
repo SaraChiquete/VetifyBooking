@@ -68,7 +68,8 @@ def logout_view(request):
 
 @login_required
 def home_view(request):
-    return render(request, 'booking/home.html')
+    total_vets = Veterinarian.objects.filter(is_active=True).count()
+    return render(request, 'booking/home.html', {'total_vets': total_vets})
 
 
 # =============================
@@ -175,6 +176,7 @@ def edit_profile(request):
 
     return render(request, 'booking/edit_profile.html', context)
 
+from datetime import date
 
 @login_required
 def register_pet_view(request):
@@ -186,7 +188,7 @@ def register_pet_view(request):
         pet.other_type = request.POST.get('other_type', '')
         pet.breed = request.POST.get('breed', '')
         pet.color = request.POST.get('color', '')
-        pet.age = request.POST.get('age', 0)
+        pet.date_of_birth = request.POST.get('date_of_birth') or None
         pet.weight = request.POST.get('weight', 0)
         pet.vaccination_status = request.POST.get('vaccination', 'updated')
         pet.allergies = request.POST.get('allergies', '')
@@ -205,7 +207,7 @@ def register_pet_view(request):
         messages.success(request, f'¡{pet.name} ha sido registrado exitosamente! 🎉')
         return redirect('profile')
 
-    return render(request, 'booking/register_pet.html')
+    return render(request, 'booking/register_pet.html', {'today': date.today().isoformat()})
 
 
 
@@ -391,8 +393,11 @@ from django.urls import resolve, reverse, NoReverseMatch
 
 @login_required
 def edit_pet(request, pet_id):
-    pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
-    
+    if request.user.is_superuser:
+        pet = get_object_or_404(Pet, id=pet_id)
+    else:
+        pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
+        
     next_url = request.GET.get('next') or request.POST.get('next')
 
     if not next_url:
@@ -402,16 +407,17 @@ def edit_pet(request, pet_id):
         pet.name = request.POST.get("name")
         pet.species = request.POST.get("species")
         pet.breed = request.POST.get("breed")
-        pet.age = request.POST.get("age")
+        pet.date_of_birth = request.POST.get('date_of_birth') or None
         pet.weight = request.POST.get("weight")
         pet.notes = request.POST.get("notes")
         pet.save()
         return redirect(next_url)
 
     return render(request, "booking/register_pet.html", {
-        "pet": pet,
-        "next": next_url
-    })
+    "pet": pet,
+    "next": next_url,
+    "today": date.today().isoformat()
+})
 
 
 @login_required

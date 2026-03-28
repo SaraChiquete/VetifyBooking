@@ -454,8 +454,18 @@
                         </div>
 
                         <div class="form-group" id="otherTypeGroup" style="display: none;">
-                            <label class="form-label">Especificar tipo</label>
-                            <input type="text" name="other_type" class="form-input" placeholder="ej: Conejo, Hámster, Ave...">
+                            <label class="form-label">Especificar tipo *</label>
+                            <select name="other_type" class="form-input" id="otherTypeSelect">
+                                <option value="">Seleccionar...</option>
+                                <option value="Conejo">🐰 Conejo</option>
+                                <option value="Hámster">🐹 Hámster</option>
+                                <option value="Ave">🦜 Ave / Pájaro</option>
+                                <option value="Tortuga">🐢 Tortuga</option>
+                                <option value="Pez">🐟 Pez</option>
+                                <option value="Reptil">🦎 Reptil</option>
+                                <option value="Hurón">🦡 Hurón</option>
+                                <option value="Otro">Otro</option>
+                            </select>
                         </div>
                     </div>
 
@@ -483,19 +493,15 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label"><i class="bi bi-cake2"></i> Edad *</label>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                    <input type="number"
-                                    name="age"
-                                    class="form-input"
-                                    placeholder="0"
-                                    min="0"
-                                    required
-                                    value="{{ pet.age|default:'' }}"
-                                    id="petAge"
-                                    onchange="updatePreview()">
-                                    <span>años</span>
-                                </div>
+                                <label class="form-label"><i class="bi bi-cake2"></i> Fecha de Nacimiento *</label>
+                                <input type="date"
+                                name="date_of_birth"
+                                class="form-input"
+                                required
+                                max="{{ today }}"
+                                value="{{ pet.date_of_birth|date:'Y-m-d'|default:'' }}"
+                                id="petDOB"
+                                onchange="updatePreview()">
                             </div>
 
                             <div class="form-group">
@@ -506,7 +512,8 @@
                                     name="weight"
                                     class="form-input"
                                     placeholder="0.0"
-                                    min="0"
+                                    min="0.1"
+                                    max="70"
                                     required
                                     value="{{ pet.weight|default:'' }}"
                                     id="petWeight"
@@ -672,53 +679,76 @@
     // Show/hide other type field
     document.querySelectorAll('input[name="species"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            document.getElementById('otherTypeGroup').style.display = 
-                this.value === 'other' ? 'block' : 'none';
+            const group = document.getElementById('otherTypeGroup');
+            const select = document.getElementById('otherTypeSelect');
+            if (this.value === 'other') {
+                group.style.display = 'block';
+                select.required = true;
+            } else {
+                group.style.display = 'none';
+                select.required = false;
+            }
         });
+    });
+
+    // Validación del formulario
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const weight = parseFloat(document.getElementById('petWeight').value);
+        const dob = document.getElementById('petDOB').value;
+
+        if (weight > 70) {
+            e.preventDefault();
+            alert('El peso no puede ser mayor a 70 kg.');
+            return;
+        }
+
+        if (dob) {
+            const birthYear = new Date(dob).getFullYear();
+            const currentYear = new Date().getFullYear();
+            if (currentYear - birthYear > 200) {
+                e.preventDefault();
+                alert('La fecha de nacimiento no es válida.');
+                return;
+            }
+        }
     });
 
     // Update preview
     function updatePreview() {
-        // Name
         const name = document.getElementById('petName').value || 'Nombre de tu mascota';
         document.getElementById('previewName').textContent = name;
 
-        // Type
-        const type = document.querySelector('input[name="species"]:checked').value;
-        const typeLabels = { dog: 'Perro', cat: 'Gato', other: 'Otro' };
+        const typeEl = document.querySelector('input[name="species"]:checked');
+        if (typeEl) {
+            const type = typeEl.value;
+            const typeLabels = { dog: 'Perro', cat: 'Gato', other: 'Otro' };
+            const icons = { dog: '🐕', cat: '🐈', other: '🐰' };
+            document.getElementById('previewType').textContent = typeLabels[type];
+            document.getElementById('previewEmoji').textContent = icons[type];
+        }
 
-        const icons = {
-            dog: '🐕',
-            cat: '🐈',
-            other: '🐰'
-        };
+        const dob = document.getElementById('petDOB').value;
+        if (dob) {
+            const age = Math.floor((new Date() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000));
+            document.getElementById('previewAge').textContent = age;
+        }
 
-        document.getElementById('previewType').textContent = typeLabels[type];
-        document.getElementById('previewEmoji').textContent = icons[type];
-
-        // Age
-        const age = document.getElementById('petAge').value || '0';
-        document.getElementById('previewAge').textContent = age;
-
-        // Weight
         const weight = document.getElementById('petWeight').value || '0';
         document.getElementById('previewWeight').textContent = weight;
 
-        // Vaccination
-        const vac = document.querySelector('input[name="vaccination"]:checked').value;
-
-        const vacLabels = {
-            updated: '<i class="bi bi-heart-pulse"></i> Vacunas al día',
-            pending: '<i class="bi bi-clock"></i> Vacunas pendientes',
-            none: '<i class="bi bi-x-circle"></i> Sin vacunas'
-        };
-
-        document.getElementById('previewVac').innerHTML = vacLabels[vac];
+        const vacEl = document.querySelector('input[name="vaccination"]:checked');
+        if (vacEl) {
+            const vacLabels = {
+                updated: '<i class="bi bi-heart-pulse"></i> Vacunas al día',
+                pending: '<i class="bi bi-clock"></i> Vacunas pendientes',
+                none: '<i class="bi bi-x-circle"></i> Sin vacunas'
+            };
+            document.getElementById('previewVac').innerHTML = vacLabels[vacEl.value];
+        }
     }
 
-    // Update preview on input change
     document.getElementById('petName').addEventListener('input', updatePreview);
-    document.getElementById('petAge').addEventListener('input', updatePreview);
+    document.getElementById('petDOB').addEventListener('change', updatePreview);
     document.getElementById('petWeight').addEventListener('input', updatePreview);
 </script>
 {% endblock %}

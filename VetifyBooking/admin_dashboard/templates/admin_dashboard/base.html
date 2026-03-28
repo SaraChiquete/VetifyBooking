@@ -26,14 +26,14 @@
         <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
 
-            <!-- Logo -->
             <div class="sidebar-logo">
-                <div class="sidebar-logo-icon">
-                    <img src="{% static 'images/vetify-logo.png' %}" alt="Vetify Logo">
+                <div style="width:48px; height:48px; flex-shrink:0;">
+                    <img src="{% static 'images/paw.png' %}" alt="Vetify" 
+                        style="width:100%; height:100%; object-fit:contain; filter:brightness(0) invert(1);">
                 </div>
-                <div class="sidebar-logo-text">
-                    <h1>Vetify Admin</h1>
-                    <p class="tagline">Panel de Control</p>
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-size:1.25rem; font-weight:800; color:white;">VetifyBooking</span>
+                    <span style="font-size:0.7rem; color:rgba(255,255,255,0.5);">Panel Administrador</span>
                 </div>
             </div>
 
@@ -126,13 +126,6 @@
                         <span class="sidebar-link-text">Horarios</span>
                     </a>
 
-                    <a href="{% url 'admin_dashboard:upload_document' %}" 
-                       class="sidebar-link {% if request.resolver_match.url_name == 'upload_document' %}active{% endif %}">
-                        <span class="sidebar-link-icon">
-                            <i class="bi bi-file-earmark-text"></i>
-                        </span>
-                        <span class="sidebar-link-text">Documentos</span>
-                    </a>
                 </div>
 
             </nav>

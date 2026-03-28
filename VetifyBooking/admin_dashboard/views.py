@@ -199,7 +199,7 @@ def users_view(request):
     
     return render(request, 'admin_dashboard/users.html', context)
 
-
+from datetime import date
 @admin_required
 def pets_view(request):
     """Vista de gestión de mascotas"""
@@ -223,7 +223,8 @@ def pets_view(request):
     total_dogs = Pet.objects.filter(pet_type='dog').count()
     total_cats = Pet.objects.filter(pet_type='cat').count()
     total_others = Pet.objects.filter(pet_type='other').count()
-    
+    users = User.objects.filter(is_superuser=False).order_by('username')
+
     context = {
         'pets': pets,
         'type_filter': type_filter,
@@ -232,8 +233,10 @@ def pets_view(request):
         'total_dogs': total_dogs,
         'total_cats': total_cats,
         'total_others': total_others,
+        'users': users,
+        'today': date.today().isoformat()
     }
-    
+
     return render(request, 'admin_dashboard/pets.html', context)
 
 
@@ -915,3 +918,55 @@ def admin_profile_view(request):
         return redirect('admin_dashboard:admin_profile')
 
     return render(request, 'admin_dashboard/admin_profile.html')
+
+
+@admin_required
+def create_pet(request):
+    if request.method == 'POST':
+        from django.contrib.auth.models import User
+        Pet.objects.create(
+            owner_id=request.POST.get('owner'),
+            name=request.POST.get('name'),
+            pet_type=request.POST.get('pet_type'),
+            breed=request.POST.get('breed', ''),
+            date_of_birth=request.POST.get('date_of_birth') or None,
+            weight=request.POST.get('weight', 0),
+            color=request.POST.get('color', ''),
+            vaccination_status=request.POST.get('vaccination_status', 'updated'),
+        )
+        messages.success(request, 'Mascota agregada exitosamente.')
+    return redirect('admin_dashboard:pets')
+
+from booking.models import Vaccine
+
+@admin_required
+def pet_vaccines_view(request, pet_id):
+    pet = get_object_or_404(Pet, id=pet_id)
+    vaccines = Vaccine.objects.filter(pet=pet).order_by('-date')
+
+    if request.method == 'POST':
+        Vaccine.objects.create(
+            pet=pet,
+            name=request.POST.get('name'),
+            date=request.POST.get('date'),
+            next_date=request.POST.get('next_date') or None,
+            notes=request.POST.get('notes', ''),
+        )
+        messages.success(request, f'Vacuna agregada a {pet.name}.')
+        return redirect('admin_dashboard:pet_vaccines', pet_id=pet.id)
+
+    context = {
+        'pet': pet,
+        'vaccines': vaccines,
+        'today': date.today(),
+    }
+    return render(request, 'admin_dashboard/pet_vaccines.html', context)
+
+
+@admin_required
+def delete_vaccine_view(request, vaccine_id):
+    vaccine = get_object_or_404(Vaccine, id=vaccine_id)
+    pet_id = vaccine.pet.id
+    vaccine.delete()
+    messages.success(request, 'Vacuna eliminada.')
+    return redirect('admin_dashboard:pet_vaccines', pet_id=pet_id)

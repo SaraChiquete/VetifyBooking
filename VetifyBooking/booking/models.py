@@ -26,7 +26,7 @@ class Pet(models.Model):
 
     breed = models.CharField(max_length=100, blank=True, verbose_name="Raza")
     color = models.CharField(max_length=50, blank=True, verbose_name="Color")
-    age = models.IntegerField(verbose_name="Edad (años)")
+    date_of_birth = models.DateField(null=True, blank=True, verbose_name="Fecha de nacimiento")
     weight = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Peso (kg)")
 
     vaccination_status = models.CharField(
@@ -417,3 +417,28 @@ class PrescriptionItem(models.Model):
 
     def __str__(self):
         return f"{self.medication} - {self.dose}"
+    
+    
+# =========================
+#     VACCINE MODEL
+# =========================
+class Vaccine(models.Model):
+    pet = models.ForeignKey(
+        Pet,
+        on_delete=models.CASCADE,
+        related_name='vaccines',
+        verbose_name="Mascota"
+    )
+    name = models.CharField(max_length=200, verbose_name="Nombre de la vacuna")
+    date = models.DateField(verbose_name="Fecha de aplicación")
+    next_date = models.DateField(null=True, blank=True, verbose_name="Próxima dosis")
+    notes = models.TextField(blank=True, verbose_name="Notas")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Vacuna"
+        verbose_name_plural = "Vacunas"
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.name} - {self.pet.name} ({self.date})"

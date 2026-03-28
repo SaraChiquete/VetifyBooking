@@ -11,6 +11,6 @@ class AppointmentAdmin(admin.ModelAdmin):
 
 @admin.register(Pet)
 class PetAdmin(admin.ModelAdmin):
-    list_display = ('name', 'owner', 'pet_type', 'age', 'vaccination_status')
+    list_display = ('name', 'owner', 'pet_type', 'date_of_birth', 'vaccination_status')
     list_filter = ('pet_type', 'vaccination_status')
     search_fields = ('name', 'owner__username')

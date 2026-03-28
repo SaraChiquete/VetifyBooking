@@ -24,6 +24,9 @@ urlpatterns = [
     # Gestión de mascotas
     path('pets/', views.pets_view, name='pets'),
     path('pets/delete/<int:pet_id>/', views.delete_pet, name='delete_pet'),
+    path('pets/create/', views.create_pet, name='create_pet'),
+    path('pets/<int:pet_id>/vaccines/', views.pet_vaccines_view, name='pet_vaccines'),
+    path('vaccines/<int:vaccine_id>/delete/', views.delete_vaccine_view, name='delete_vaccine'),
 
     # Gestión de veterinarios
     path('veterinarians/', views.veterinarians_view, name='veterinarians'),

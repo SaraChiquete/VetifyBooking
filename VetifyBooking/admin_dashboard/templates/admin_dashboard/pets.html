@@ -352,18 +352,18 @@
 <div class="table-container">
 
     <div class="table-header">
-
         <div>
             <h2 class="table-title">
                 <i class="bi bi-grid"></i> Listado de Mascotas
             </h2>
-
             <p class="table-count">
                 {{ total_count }} mascota{{ total_count|pluralize }}
                 encontrada{{ total_count|pluralize }}
             </p>
         </div>
-
+        <button onclick="document.getElementById('modalCrearMascota').style.display='flex'" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Agregar Mascota
+        </button>
     </div>
 
     {% if pets %}
@@ -418,11 +418,18 @@
                     </div>
 
                     <div class="pet-actions">
-                        <a href="{% url 'edit_pet' pet.id %}?next={% url 'admin_dashboard:pets' %}" 
+                        <a href="{% url 'admin_dashboard:pet_vaccines' pet.id %}"
+                            class="action-btn" style="background:#f0fdf4; color:#15803d;">
+                            <i class="bi bi-capsule"></i> Vacunas
+                        </a>
+
+                        <a href="{% url 'edit_pet' pet.id %}?next={% url 'admin_dashboard:pets' %}"
                             class="action-btn" style="background:#dbeafe; color:#1e40af;">
                             <i class="bi bi-pencil"></i> Editar
                         </a>
-                        <a href="{% url 'admin_dashboard:delete_pet' pet.id %}" class="action-btn btn-delete"
+
+                        <a href="{% url 'admin_dashboard:delete_pet' pet.id %}" 
+                        class="action-btn btn-delete"
                         onclick="return confirm('¿Eliminar a {{ pet.name }}?')">
                             <i class="bi bi-trash"></i> Eliminar
                         </a>
@@ -452,6 +459,91 @@
 
     {% endif %}
 
+</div>
+
+<!-- Modal Agregar Mascota -->
+<div id="modalCrearMascota" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:1rem; padding:2rem; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; margin:1rem;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h2 style="font-size:1.25rem; font-weight:700; color:#0f172a;">
+                <i class="bi bi-heart-pulse"></i> Agregar Mascota
+            </h2>
+            <button onclick="document.getElementById('modalCrearMascota').style.display='none'"
+                    style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#6b7280;">✕</button>
+        </div>
+
+        <form method="POST" action="{% url 'admin_dashboard:create_pet' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Dueño *</label>
+                    <select name="owner" required class="filter-input">
+                        <option value="">Seleccionar usuario...</option>
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.username }} — {{ u.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Nombre *</label>
+                    <input type="text" name="name" required placeholder="Nombre de la mascota" class="filter-input">
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Tipo *</label>
+                    <select name="pet_type" required class="filter-input">
+                        <option value="dog">🐕 Perro</option>
+                        <option value="cat">🐈 Gato</option>
+                        <option value="other">🐰 Otro</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Raza</label>
+                    <input type="text" name="breed" placeholder="Raza" class="filter-input">
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Fecha de Nacimiento *</label>
+                    <input type="date" name="date_of_birth" required max="{{ today }}" class="filter-input">
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Peso (kg) *</label>
+                    <input type="number" name="weight" required min="0" step="0.1" placeholder="0.0" class="filter-input">
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Color</label>
+                    <input type="text" name="color" placeholder="ej: Café, Negro" class="filter-input">
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                    <label style="font-size:0.875rem; font-weight:600; color:#374151;">Vacunación</label>
+                    <select name="vaccination_status" class="filter-input">
+                        <option value="updated">Al día</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="none">Sin vacunas</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                <button type="button" onclick="document.getElementById('modalCrearMascota').style.display='none'"
+                        class="btn" style="flex:1; background:white; border:2px solid #e5e7eb; color:#374151;">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary" style="flex:2;">
+                    <i class="bi bi-plus-circle"></i> Agregar Mascota
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

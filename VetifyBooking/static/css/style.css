@@ -1533,3 +1533,23 @@ main { min-height: 60vh; }
 @media (max-width: 380px) {
     .schedules-table { grid-template-columns: 1fr; }
 }
+a.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+}
+
+a.btn-primary:hover {
+    color: white;
+    text-decoration: none;
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(2,132,199,0.4);
+}
