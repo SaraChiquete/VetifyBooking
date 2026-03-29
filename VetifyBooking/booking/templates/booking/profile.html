@@ -174,8 +174,8 @@
                     </div>
                     <div class="pet-info">
                         <h3 class="pet-name">{{ pet.name }}</h3>
-                        <span class="pet-badge pet-badge-{{ pet.species }}">
-                            {{ pet.get_species_display }}
+                        <span class="pet-badge pet-badge-{{ pet.pet_type }}">
+                            {{ pet.get_pet_type_display }}
                         </span>
                     </div>
                 </div>
@@ -187,11 +187,17 @@
                     </div>
                     <div class="pet-detail-item">
                         <i class="bi bi-calendar3"></i>
-                        <span>{{ pet.age|default:"Edad no registrada" }}</span>
+                        <span>
+                            {% if pet.date_of_birth %}
+                                {{ pet.date_of_birth|date:"d/m/Y" }}
+                            {% else %}
+                                Fecha no registrada
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="pet-detail-item">
-                        <i class="bi bi-gender-ambiguous"></i>
-                        <span>{{ pet.get_gender_display|default:"No especificado" }}</span>
+                        <i class="bi bi-heart-pulse"></i>
+                        <span>{{ pet.get_vaccination_status_display }}</span>
                     </div>
                 </div>
 
@@ -203,6 +209,10 @@
                     <a href="{% url 'booking' %}?pet={{ pet.id }}" class="pet-btn pet-btn-primary">
                         <i class="bi bi-calendar-plus"></i>
                         Reservar
+                    </a>
+                    <a href="{% url 'pet_detail' pet.id %}"
+                        style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.5rem 1rem; background:#dbeafe; color:#1e40af; border-radius:0.5rem; text-decoration:none; font-size:0.875rem; font-weight:600; margin-top:0.5rem;">
+                        <i class="bi bi-capsule"></i> Ver vacunas
                     </a>
                 </div>
             </div>

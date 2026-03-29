@@ -505,4 +505,17 @@ def export_prescription_pdf(request, prescription_id):
     response['Content-Disposition'] = f'attachment; filename="receta_{prescription.consultation.appointment.pet.name}_{prescription.consultation.appointment.date}.pdf"'
     return response
 
+from .models import Vaccine
 
+@login_required
+def pet_detail_view(request, pet_id):
+    pet = get_object_or_404(Pet, id=pet_id, owner=request.user)
+    vaccines = Vaccine.objects.filter(pet=pet).order_by('-date')
+    today = date.today()
+
+    context = {
+        'pet': pet,
+        'vaccines': vaccines,
+        'today': today,
+    }
+    return render(request, 'booking/pet_detail.html', context)

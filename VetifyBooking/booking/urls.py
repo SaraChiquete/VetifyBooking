@@ -16,6 +16,7 @@ urlpatterns = [
     path('register-pet/', views.register_pet_view, name='register_pet'),
     path('pet/<int:pet_id>/edit/', views.edit_pet, name='edit_pet'),
     path('pet/<int:pet_id>/delete/', views.delete_pet, name='delete_pet'),
+    path('pet/<int:pet_id>/', views.pet_detail_view, name='pet_detail'),
 
     path('documents/', views.documents_view, name='documents'),
     path('services-schedules/', views.services_schedules_view, name='services_schedules'),
